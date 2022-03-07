@@ -1,0 +1,635 @@
+---
+# Preámbulo con paquetes y definiciones básicas
+# Se incluyen los comandos mínimos de LaTeX
+#title: Tarea 01\\ Regresión, 2022-2
+author:
+ - Diana Malinally Barrios Suárez (malinally@ciencias.unam.mx)\and
+ - Mónica Valeria Galindo Madrigal (monigalindo3@gmail.com)\and
+ - Sebastián Giraldo Grisales (sgiraldo88@outlook.com)\and
+ - Julio César Rojas Vigueras (juliocrv20@gmail.com)\and
+ - Arturo Sánchez González (arturo.sanchez@im.unam.mx)
+header-includes:
+  - \usepackage{amsmath}
+  - \allowdisplaybreaks #% para permitir rompimiento de ecuaciones en p\'aginas distintas
+    #% ver http://tex.stackexchange.com/questions/51682/is-it-possible-to-pagebreak-aligned-equations
+    #% para m\'as detalles
+  #- \numberwithin{equation}{section} # Para numerar ecuaciones por secciones cuando están numeradas
+  - \usepackage{amssymb}
+  - \usepackage{mathtools}
+  - \usepackage{braket}
+  - \usepackage[shortlabels]{enumitem}
+  - \usepackage[spanish]{babel}
+  - \decimalpoint
+  - \usepackage{graphicx}
+  - \usepackage{caption}
+  - \renewcommand{\and}{\\}
+  - \renewcommand{\arraystretch}{1.2}
+  - \usepackage[font=small,labelfont=bf]{caption}
+  - \usepackage{fancyhdr}
+  - \usepackage{dsfont}
+  # Usa el comando \mathds{1}
+  # Ver
+  # https://tex.stackexchange.com/questions/26637/how-do-you-get-mathbb1-to-work-characteristic-function-of-a-set
+  # para más información acerca de números con estilo mathbb
+  - \newcommand{\mb}[1]{\mathbb{#1}}
+  # para usar kableExtra se requieren los siguientes paquetes
+  # ver
+  # https://haozhu233.github.io/kableExtra/awesome_table_in_pdf.pdf
+  # para más detalles
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{array}
+  - \usepackage{multirow}
+  - \usepackage{wrapfig}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage{pdflscape}
+  - \usepackage{tabu}
+  - \usepackage{threeparttable}
+  - \usepackage{threeparttablex}
+  - \usepackage[normalem]{ulem}
+  - \usepackage{makecell}
+  - \usepackage{xcolor}
+output: 
+  pdf_document:
+    #toc: true
+    #toc_depth: 2
+    #number_sections: true
+    df_print: kable
+    highlight: tango
+---
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE, collapse = TRUE)
+knitr::knit_theme$set("acid")
+```
+
+```{r include = FALSE, echo = FALSE}
+##  LIBRERÍAS
+# Aquí vamos a incluir las librerías que necesitemos
+# En donde se pongan pedazos de código, únicamente se comentará
+# Es BUENA PRÁCTICA poner las librerías al principio, por ello las ponemos aquí
+# library(library_name)
+library(knitr)
+#install.packages("kableExtra")
+library(kableExtra)
+library(gginference)
+library(ggplot2)
+library(dplyr)
+#library(hrbrthemes)
+library(viridis)
+library(scales)  # for percentage scales
+library(gridExtra)
+library(EnvStats)
+library(lmtest)
+#library(tigerstats)
+```
+
+
+\begin{flushleft}
+Regresión \\
+Semestre 2022-2 \\
+\textbf{Tarea 01\\ Equipo 10} \\
+ \begin{itemize}
+  \item Diana Malinally Barrios Suárez (malinally@ciencias.unam.mx)
+  \item Mónica Valeria Galindo Madrigal (monigalindo3@gmail.com)
+  \item Sebastián Giraldo Grisales (sgiraldo88@outlook.com)
+  \item Julio César Rojas Vigueras (juliocrv20@gmail.com)
+  \item Arturo Sánchez González (arturo.sanchez@im.unam.mx)
+ \end{itemize}
+\end{flushleft}
+
+---
+
+<!-- INICIO DOCUMENTO -->
+# Pregunta 1
+En una regresión de la variable $y$ sobre $x$, la ecuación considerada es $1500 + b(x-68)$ para alguna constante $b$. Si el coeficiente de correlación muestral entre $x$ y $y$ es $0.81$ y las desviaciones estándar muestrales de $x$ y $y$ son $220$ y $2.5$, respectivamente, determine el valor esperado de $Y$ cuando $x = 70$.
+
+## Solución a la Pregunta 1
+
+\begin{align*}
+r=&\dfrac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sqrt{\sum_{i=1}^n(x_i-\bar{x})^2}\sqrt{\sum_{i=1}^n(y_i-\bar{y})^2}}=\dfrac{S_{xy}}{\sqrt{S_{xx}}\sqrt{S_{yy}}}=0.81 \\
+S_{x}=&\sqrt{\dfrac{\sum(x_i-\bar{x})^2}{n-1}}=\dfrac{\sqrt{\sum(x_i-\bar{x})^2}}{\sqrt{n-1}}=\dfrac{\sqrt{S_{xx}}}{\sqrt{n-1}}=2.5\\
+S_{y}=&\sqrt{\dfrac{\sum(y_i-\bar{y})^2}{n-1}}=\dfrac{\sqrt{\sum(y_i-\bar{y})}}{\sqrt{n-1}}=\dfrac{\sqrt{S_{yy}}}{\sqrt{n-1}}=220
+\end{align*}
+
+Ahora bien la función para encontrar el valor de $y_i$ está dada por $\hat{y_i}=\hat{\beta_0}+\hat{\beta_1}x_i$. Por lo que necesitamos encontrar $\hat{\beta_0}$ y $\hat{\beta_1}$. Gracias a los datos del ejercicio conocemos que la ecuación es $y=1500+bx-68b$. De esto se puede inferir que $b=\hat{\beta_1}$
+
+Despejando de las ecuaciones antes planteadas tenemos que:
+\begin{align*}
+    S_{xx}&=(2.5)^2(n-1)=6.25(n-1)\\
+    S_{yy}&=(220)^2(n-1)=48400(n-1)
+\end{align*}
+por lo que
+\begin{align*}
+    \hat{\beta_1}&=\dfrac{S_{xy}}{S_{xx}}=\dfrac{(0.81)\sqrt{S_{xx}}\sqrt{S_{yy}}}{(6.25)(n-1)}=\dfrac{(0.81)220(2.5)(n-1)}{6.25(n-1)}=71.28
+\end{align*}
+
+Entonces el valor de $\hat{y_i}=1500-68(71.28)+71.28(70)=1642.56$
+
+---
+
+\newpage
+
+# Pregunta 2
+Usted cuenta con la siguiente información acerca de un modelo de regresión simple en 10 observaciones:
+\begin{itemize}
+  \item $\sum x_i = 20$
+  \item $\sum y_i = 100$
+  \item $s_x = 2$
+  \item $s_y = 8$
+  \item $r_{x,y} = -0.98$
+\end{itemize}
+Determine el valor predicho de $y$ cuando $x = 5$.
+
+## Solución a la Pregunta 2
+
+Considerando los datos conocidos sabemos que:
+
+\begin{align*}
+\bar{x}&=\dfrac{20}{10}=2 \\
+\bar{y}&=\dfrac{100}{10}=10 \\
+S_x=&\dfrac{\sqrt{\sum_{i=1}^{n}(x_i-\bar{x})^2}}{\sqrt{9}}=2 \longrightarrow \sqrt{S_{xx}}=6 \longrightarrow S_{xx}=6^2\\
+S_y=&\dfrac{\sqrt{\sum_{i=1}^{n}(x_i-\bar{x})^2}}{\sqrt{9}}=8 \longrightarrow \sqrt{S_{yy}}=24 \longrightarrow S_{yy}=24^2\\
+r_{xy}=&\dfrac{S_{xy}}{\sqrt{S_{xx}}\sqrt{S_{yy}}} \longrightarrow S_{xy}=\sqrt{S_{xx}}(\sqrt{S_{yy}})(-.98)=(6)(24)(-.98)=-141.12
+\end{align*}
+
+Ahora sabemos que:
+
+\begin{align*}
+\hat{\beta_1}&=\dfrac{S_{xy}}{S_{xx}}=\dfrac{-141.12}{36}=-3.92\\
+\hat{\beta_0}&=\bar{y}-\beta_1\bar{x}=10-(-3.92)(2)=17.84\\
+\end{align*}
+
+
+De acuerdo con la ecuación $\hat{y_i}=\hat{\beta_0}+\hat{\beta_i}x_i$ el valor predecido para $x=5$ es:
+
+\begin{equation*}
+    \hat{y_5}=17.84+(-3.92)(5)=-1.76
+\end{equation*}
+    
+    
+---
+
+\newpage
+
+# Pregunta 3
+Considere un modelo de regresión lineal simple que utilizó $50$ observaciones, se sabe que:
+  \begin{enumerate}
+    \item La varianza de la variable de $x$ es $108$.
+    \item La suma de los residuales al cuadrado es $234$.
+  \end{enumerate}a. 
+Calcular la varianza del estimador de $\beta_1$.
+
+## Solución a la Pregunta 3
+Sabemos que la formula de la varianza muestral está dada por la siguiente formula:
+
+\begin{align*}
+    s_x^2&=\dfrac{\sum_{i=1}^{n}(x_i-\bar{x})^2}{49}=108 \longrightarrow \sum_{i=1}^{n}(x_i-\bar{x})^2 = 108(49) =5292
+\end{align*}
+
+Y además que
+\begin{equation*}
+    \sum_{i=1}^{50} e_i^2= \sum_{i=1}^{50} (y_i-\hat{y_1})^2=234
+\end{equation*}
+
+Ahora bien por lo visto en clase un buen estimador para la varianza de los errores será: 
+
+\begin{equation*}
+    S^2= \dfrac{SSE}{n-2}=\dfrac{234}{48}=4.875
+\end{equation*}
+
+La varianza del estimador se calcula de la siguiente manera:
+
+\begin{align*}
+var(\hat{\beta_1})=\dfrac{\sigma^2}{S_{xx}}=\dfrac{4.875}{5292}=0.0009
+\end{align*}
+
+---
+
+\newpage
+
+# Pregunta 4
+Usted está ajustando el modelo de regresión lineal $y_i = \beta_0 + \beta_1 x_i + \epsilon_{1}$, con $20$ observaciones. Además, usted sabe que
+\begin{itemize}
+\item $\sum \left( y_{i} - \hat{y}_{i}\right)^{2}$
+\item $\overline{y} = 10$
+\item $\sum \left(\hat{y}_i - \overline{y}_i\right)^{2} = 108$.
+\end{itemize}
+Calcular $R^{2}$.
+
+## Solución a la Pregunta 4
+
+---
+
+\newpage
+
+# Pregunta 5
+En este ejercicio se considerará el conjunto de datos `heights`, que contiene información de alturas de madres e hijas.
+
+
+```{r datos_p5, eval=FALSE, include=FALSE}
+# install.packages("remotes") # instalarlo solamente una vez
+#remotes::install_github("avehtari/ROS-Examples",subdir = "rpackage")
+library(rosdata)
+data("heights")
+df <- heights
+head(df)
+```
+
+
+\bigskip
+
+  1.  Explore y visualice la distribución de la variable `mother_height`.
+
+  2. Explore y visualice la distribución de la variable `daughter_height`.
+  
+  3. Establezca si existe un relación lineal potencial entre las variables `mother_height` y `daughter_height`.
+  
+  4. Haga un análisis de regresión de `mother_height ~ daughter_height` (Modelo A), obteniendo los estimadores, $R^2$ y gráficas de diagnóstico de hipótesis del modelo lineal.
+  
+  5. ¿Afirmaría que se presenta el fenómeno de regresión a la media? Justifique.
+  
+  6. Haga un análisis de regresión de `daughter_height ~ mother_height` (Modelo Z), obteniendo los estimadores, $R^2$ y gráficas de diagnóstico de hipótesis del modelo lineal.
+
+
+## Solución a la Pregunta 5
+
+---
+
+\newpage
+
+# Pregunta 6
+Suponga que $\hat{\beta}_{0}$ y $\hat{\beta}_{1}$ son los estimadores por mínimos cuadrados del modelo $y_{i} = \beta_{0} + \beta_{1} x_i + \epsilon_{i}$. Demostrar que los estimadores por mínimos cuadrados para $\beta_{0}$ y $\beta_{1}$ son estimadores lineales e insesgados, i. e., $\hat{\beta}_{0} = \sum\limits_{i=1}^{n} a_{i}y_{i}$ y $\hat{\beta}_{1} = \sum\limits_{i=1}^{n} b_{i}y_{i}$, y son ambos insesgados.
+
+
+## Solución a la Pregunta 6
+
+En primer lugar, consideremos las ecuaciones normales de los estimadores por mínimos cuadrados:
+\begin{align*}
+  \sum\limits_{i=1}^{n} y_i & = n\hat{\beta}_0 + \hat{\beta}_1 \sum\limits_{i=1}^{n} x_i, \\
+  \sum\limits_{i=1}^{n} y_i x_i & = \hat{\beta}_{0} \sum\limits_{i=1}^{n} x_i + \hat{\beta}_{1} \sum\limits_{i=1}^{n} x_{i}^{2}.
+\end{align*}
+
+A partir de la primera ecuación obtenemos que
+\[
+  \hat{\beta}_0 = \frac{\sum\limits_{i=1}^{n}y_i}{n} - \frac{\hat{\beta}_1 \sum\limits_{i=1}^{n} x_i}{n} = \overline{y} - \hat{\beta}_1 \overline{x}
+\]
+Luego, al sustituir en la segunda ecuación normal obtenemos
+
+\[
+  \sum\limits_{i=1}^{n} y_i x_i  = (\overline{y} - \hat{\beta}_{1} \overline{x}) \sum\limits_{i=1}^{n} x_i  + \hat{\beta}_{1} \sum_{i=1}^{n} x_{i}^{2}
+\]
+de donde se sigue que
+\[
+  \sum\limits_{i=1}^{n} y_i x_i - \overline{y} \sum\limits_{i=1}^{n} x_i = \hat{\beta}_{1} \left( \sum_{i=1}^{n} x_{i}^{2} - \overline{x}\sum\limits_{i=1}^{n} x_{i} \right)
+\]
+y por ello
+\[
+  \hat{\beta}_{1} = \frac{ \sum\limits_{i=1}^{n} y_i x_i - \overline{y} \sum\limits_{i=1}^{n} x_i  }{ \sum\limits_{i=1}^{n} x_{i}^{2} - \overline{x}\sum\limits_{i=1}^{n} x_{i}  } = \frac{ \sum\limits_{i=1}^{n} (y_i - \overline{y}) (x_i - \overline{x}) }{ \sum\limits_{i=1}^{n} (x_i - \overline{x})^{2} }
+\]
+porque
+\[
+  \sum\limits_{i=1}^{n} (x_i - \overline{x})^{2} = \sum\limits_{i=1}^{n} x_{i}^{2} - \overline{x}\sum\limits_{i=1}^{n} x_{i} 
+\]
+y también
+\[
+  \sum\limits_{i=1}^{n} (y_i - \overline{y}) (x_i - \overline{x}) = \sum\limits_{i=1}^{n} y_i x_i - \overline{y} \sum\limits_{i=1}^{n} x_i,
+\]
+y estamos usando que $\sum\limits_{i=1}^{n} x_i = n\overline{x}$.
+
+
+
+Si denotamos $S_{xx} = \sum\limits_{i=1}^{n} (x_i - \overline{x})^{2}$, obtenemos que
+\begin{align*}
+  \hat{\beta}_0 & = \frac{ \sum\limits_{i=1}^{n}y_i }{n} - \hat{\beta}_{1} \overline{x} \\
+  & = \frac{ \sum\limits_{i=1}^{n}y_i }{n} - \left( \frac{ \sum\limits_{i=1}^{n} (y_i - \overline{y}) (x_i - \overline{x}) }{S_{xx}} \right) \overline{x} \\
+  & = \frac{ \sum\limits_{i=1}^{n}y_i }{n} - \sum\limits_{i=1}^{n} y_i \frac{x_i - \overline{x}}{S_{xx}} + \frac{\overline{y}}{S_{xx}} \sum\limits_{i=1}^{n} (x_i - \overline{x}) \\
+  & = \sum\limits_{i=1}^{n} \left( \frac{1}{n} - \frac{x_i - \overline{x}}{S_{xx}}  \right) y_i
+\end{align*}
+Por lo tanto, $\hat{\beta}_{0}$ es lineal.
+
+
+Los calculos del segundo sumando muestran que
+\[
+  \hat{\beta}_1 = \sum\limits_{i=1}^{n} \frac{(x_i - \overline{x})}{S_{xx}} y_i
+\]
+y por lo tanto, $\hat{\beta}_{1}$ también es lineal.
+
+
+
+Pasemos ahora a calcular las esperanzas de los estimadores anteriores. Empezaremos mostrando que $\mathbb{E}(\hat{\beta}_1) = \beta_1$. Tenemos que
+\begin{align*}
+  \mathbb{E}\left( \hat{\beta}_1 \right) & = \mathbb{E}\left( \sum\limits_{i=1}^{n} \frac{(x_i - \overline{x})}{S_{xx}} y_i \right) \\
+  & = \frac{1}{S_{xx}} \mathbb{E}\left( \sum\limits_{i=1}^{n} (x_i - \overline{x}) \right) \\
+  & = \frac{1}{S_{xx}} \sum\limits_{i=1}^{n} \mathbb{E} \left( y_i(x_i - \overline{x}) \right) \\
+  & = \frac{1}{S_{xx}} \sum\limits_{i=1}^{n} \mathbb{E} \left( y_i \right) (x_i - \overline{x}) \\
+  & = \frac{1}{S_{xx}} \sum\limits_{i=1}^{n} \left( \beta_0 + \beta_1 x_i \right) (x_i - \overline{x}) \\
+  & = \frac{1}{S_{xx}} \left( \sum\limits_{i=1}^{n} \beta_{0} (x_i - \overline{x}) + \sum\limits_{i=1}^{n} \beta_1 x_i (x_i - \overline{x})  \right) \\
+  & = \frac{1}{S_{xx}} \left( \beta_{0} \sum\limits_{i=1}^{n} (x_i - \overline{x})  + \beta_1 \sum\limits_{i=1}^{n} x_i (x_i - \overline{x})  \right) \\
+  & = \beta_1 \frac{\sum\limits_{i=1}^{n} x_i (x_i - \overline{x}) }{S_{xx}} \\
+  & = \beta_1
+\end{align*}
+porque
+\[
+  S_{xx} = \sum\limits_{i=1}^{n} (x_i-\overline{x})^{2} = \sum\limits_{i=1}^{n} x_i(x_i - \overline{x}) - \sum\limits_{i=1}^{n} \overline{x}(x_i - \overline{x}) = \sum\limits_{i=1}^{n} x_i (x_i - \overline{x})
+\]
+pues $\sum\limits_{i=1}^{n} \overline{x}(x_i - \overline{x}) = 0$. Por lo tanto, $\hat{\beta}_1$ es un estimador insesgado de $\beta_1$.
+
+
+Finalmente
+\begin{align*}
+  \mathbb{E}\left( \hat{\beta}_0\right) & = \mathbb{E} \left( \overline{y} - \hat{\beta}_1\overline{x} \right) & = \mathbb{E}\left( \overline{y} \right) - \mathbb{E} \left( \hat{\beta}_1 \overline{x} \right) \\
+  & = \frac{1}{n}\sum\limits_{i=1}^{n} \mathbb{E}(y_i) - \overline{x}\mathbb{E}(\hat{\beta}_{1}) \\
+  & = \frac{1}{n} \sum\limits_{i=1}^{n} \left( \beta_0 + \beta_1 x_i\right) - \overline{x}\beta_1 \\
+  & = \beta_0 + \beta_1\overline{x} - \overline{x}\beta_1 \\
+  & = \beta_0.
+\end{align*}
+
+En conclusión, $\hat{\beta}_0$ es un estimador insesgado de $\beta_0$.
+
+---
+
+\newpage
+
+# Pregunta 7
+Suponga que $\hat{\beta}_{0}$ y $\hat{\beta}_{1}$ son los estimadores por mímimos cuadrados del modelo $y_i = \beta_{0} + \beta_{1} x_{i} + \epsilon_{i}$. Mostrar que $\hat{\mu}_{0} : = \hat{\beta}_{0} + \hat{\beta}_{1} x_0$ es un estimador insesgado de $\mu_{0} = \beta_{0} + \beta_{1} x_0$, y calcular su varianza.
+
+
+## Solución a la Pregunta 7
+
+
+---
+
+\newpage
+
+# Pregunta 8
+Sea $\hat{\sigma}_{MV}^{2}$ es el estimador máximo verosimil para el modelo
+\[
+  y_i\vert x_i \sim N\left( \beta_0 + \beta_1 x_i, \ \sigma^{2} \right)
+\]
+para una muestra de tamaño $n$.
+
+Sea $\hat{\sigma}_{MCO}^{2}$ el estimador por mínimos cuadrados para $\sigma^{2}$ en el modelo $y_i = \beta_{0} + \beta_{1}x_i + \epsilon_{i}$, para una muestra de tamaño $n$.
+
+Calcular el error cuadrático medio de $\hat{\sigma}_{MCO}^{2}$ y de $\hat{\sigma}_{MV}^{2}$. **Hint:** Obtener el valor esperado y la varianza a través de la expresión $\chi^{2}$ de $\hat{\sigma}_{MCO}^{2}$.
+
+
+## Solución a la pregunta 8
+
+
+
+---
+
+\newpage
+
+# Pregunta 9
+Mostrar que $SCR = \sum\limits_{i=1}^{n}\left( \hat{y}_i - \overline{y}\right)^{2} = S_{xx}\hat{\beta}_{1}^{2}$. **Hint:** Considerar $\sum\limits_{i=1}^{n}\beta_{0} = \sum\limits_{i=1}^{n} \hat{y}-{i} - \beta_1 \sum\limits_{i=1}^{n} x_i$, y recordar que $\overline{y} = \frac{1}{n}\sum\limits_{i=1}^{n}\hat{y}_{i}$.
+
+
+## Solución a la Pregunta 9
+
+
+---
+
+\newpage
+
+# Pregunta 10
+```{r datos_p10}
+# install.packages("mlbench") # Sólo se hace una vez
+library(mlbench)
+data("BostonHousing")
+df <- BostonHousing
+head(df)
+```
+
+
+En este ejercicio usaremos como variable objetivo/respuesta a `medv`:
+  
+  * `medv` : median value of owner-occupied homes in USD 1000's
+
+1. Explore y visualice la distribución de la variable objetivo.
+
+A continuación mostramos algunos valores que nos pueden apoyar a entender la distribución de la variable objetivo. Además, podemos visualizar su distribución en el siguiente histograma.
+
+```{r echo=FALSE}
+summary(df$medv)
+ggplot(df, aes(x=medv)) +
+  geom_histogram(binwidth = 5, fill = "purple", color = "black") +
+  xlab("medv") + ylab("Frecuencia") + ggtitle("Histograma de medv")
+```
+
+
+
+2. Se tienen 5 posibles variables que están relacionadas con `medv`: `crim`, `rm`, `age`, `rad`, `tax` y `lstat`.
+  
+  * `crim`: per capita crime rate by town
+  * `rm`: average number of rooms per dwelling
+  * `age`: proportion of owner-occupied units built prior to $1940$
+  * `rad`: index of accesibility to radial highways
+  * `tax`: full-value property-tax rate per USD $10,000$
+  * `lstat`: percentage of lower status of the population
+
+Explore y visualice correlaciones potenciales entre `medv` y cada una de las variables propuestas.
+
+
+
+```{r echo=FALSE}
+df1 <- df[,c('medv','crim','rm','age','rad','tax','lstat')]
+a <- cor(df1)[,c(1,2)]
+variable <- c('medv','medv','medv','medv','medv','medv')
+outcome <- c('crim','rm','age','rad','tax','lstat')
+correlation_coeff <- c(a[[2]], a[[3]], a[[4]], a[[5]], a[[6]],a[[7]])
+data <- data.frame(variable, outcome, correlation_coeff)
+
+ggplot(data, aes(variable, outcome, fill = correlation_coeff)) +
+  geom_tile(color = "black") +
+  geom_text(aes(label = paste("cor =", trunc(100*correlation_coeff)/100 )), size = 3) +
+  scale_fill_gradientn(colors = c("blue", "white", "red"), limits = c(-1, 1)) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 14)) +
+  labs(fill = "Coef. de correlación") +
+  coord_equal() +
+  ggtitle("Correlaciones con la variable medv")
+```
+
+En la imagen podemos ver que $medv$ está fuertemente correlacionada con las variables $rm$ e $Isat$. Con la primera tiene una correlación positiva, mientras que con la segunda tiene una correlación negativa.
+También podemos ver que está medianamente correlacionada negativamente con la variable $tax$.
+Finalmente, con las variables $rad$, $crim$ y $age$ consideramos no tiene una fuerte correlación.
+
+ 3. Diga si es pertinente establecer las siguientes relaciones lineales, así como si satisfacen las hipótesis de cada una de las siguientes parejas:
+ 
+ * `medv ~ crim`
+ * `medv ~ rm`
+ * `medv ~ age`
+ * `medv ~ rad`
+ * `medv ~ tax`
+ * `medv ~ lstat`
+ 
+ Es decir, obtenga los coeficientes de pendiente y ordenada al origen, sus intervalos de confianza, la $R^2$ correspondiente y las gráficas de diagnóstico de hipótesis del modelo lineal.
+ 
+ 
+## Solución a la Pregunta 10
+
+Primero veamos $medv \sim crim$.
+
+Podemos inferir del diagrama de dispersión que una regresión lineal simple no ajustará bien a los datos, pues no encontramos justificación alguna para realizar un ajuste lineal
+
+```{r echo=F,  out.width="80%"}
+plot(df$crim, df$medv, title("Diagrama de dispersión"))
+mod <- lm(df$medv ~ df$crim)
+#summary(mod)
+abline(mod,col="purple")
+```
+
+También, en las siguientes gráficas, podemos ver que no se cumple el supuesto de normalidad de los errores. Además, podemos ver (en la gráfica de arriba y hacia la izquierda) que no hay independencia entre predictores y errores, pues dependiendo de la posición del punto variará el valor del error
+```{r echo=F}
+par(mfrow = c(2, 2))
+plot(mod)
+```
+Así, concluimos que un modelo lineal no es adecuado para modelar la relación entre estas dos variables.
+
+
+
+Ahora veamos qué ocurre con $medv \sim rm$.
+
+En el diagrama vemos que hay cierta relación entre ambas variables. Al momento de graficar la línea de regresisón, podemos observar que explica cierto comportamiento entre ambas variables, mas puede este no ser muy preciso, pues hay varios puntos que se encuentran lejanos a la recta. Estos puntos aislados podrían ser valores atípicos.
+También podemos ver que el modelo explica el 48% de la variabilidad de los datos.
+```{r echo=F,  out.width="80%"}
+#plot.new
+plot(df$rm, df$medv, title("Diagrama de dispersión"))
+mod2 <- lm(df$medv ~ df$rm)
+abline(mod2,col="purple")
+summary(mod2)
+
+#ggplot(df, aes(x=medv,y=rm))+
+#    geom_point() +   geom_smooth(method = "lm")
+```
+
+En la gráfica de los residuales estandarizados podemos ver que no hay independencia entre predictores y errores, pues aquellos acumulados en el centro se encuentran más cercanos y concentrados que aquellos que se encuentran lejos. Más aún, vemos que no se cumple el supuesto de heterocedasticidad, pues conforme el valor sobre el eje x de la misma gráfica va incrementando, la dispersión de los errores alrededor de la línea roja va disminuyendo, de tal forma que la nube de puntos se asemeja a un medio cono que se va cerrando de izquieda a derecha.
+
+Otro supuesto que no se cumple es la normalidad de los errores, pues estos no se encuentran sobre una línea. Finalmente podemos notar que efectivamente hay presencia de valores atípicos.
+```{r echo=F}
+par(mfrow = c(2, 2))
+plot(mod2)
+```
+Ahora, dando seguimiento al análisis de estas dos variables, a continuación repetiremos el procedimiento pero omitiendo aquellos puntos cuya distancia de Cook's sea mayor a $\frac{4}{n}$, donde n es la cantidad de datos que tenemos.
+
+Así, a continuación mostramos el diagrama de dispersión sin los datos considerados como outliers. Además mostramos con morado el modelo de regresión lineal simple.
+```{r echo=F,  out.width="80%"}
+#plot.new
+mod <- lm(df$medv ~ df$rm)
+cooksd <- cooks.distance(mod)
+influential <- as.numeric(names(cooksd)[(cooksd > (4/length(df$rm)))])
+new.rm <- df$rm[-influential]
+new.medv <- df$medv[-influential]
+
+plot(new.rm, new.medv, title("Diagrama de dispersión"))
+mod2 <- lm(new.medv ~ new.rm)
+abline(mod2,col="purple")
+summary(mod2)
+```
+Podemos ver que el modelo lineal propuesto ajusta adecuadamente a los datos, a menos a primera vista, aunque es importante notar que, al parecer, el valor del residual de un punto depende de su posición. Además, ahora, el modelo explica el 53% de la variabilidad de los datos.
+
+A continuación veamos si los supuestos se cumplen.
+
+```{r echo=F}
+par(mfrow = c(2, 2))
+plot(mod2)
+```
+Como comentamos, el error depende de la posición, y por lo tanto el supuesto de independecia entre predictor y residual no se cumple.
+
+La normalidad de los errores sí parece cumplirse.
+
+Así, podemos concluir que, aunque el modelo de regresión lineal no se ajuste completamente, podría servir para predecir valores de la variable objetivo cuando $rm$ toma valores menores a $5$ y mayores a $7$, pues dentro del intervalo comprendido por estos valores los puntos parecen tener mayor variabilidad.
+
+Es muy importante aclarar que esta última conclusión se realizó omitiendo aquellos valores que cumplían cierto criterio. Así, es cuestión del investigador tomar una decisión en cuanto a si existe o no justificación para remover tales puntos. Esto determinará la validez o no del modelo.
+
+
+
+Ahora veamos $medv \sim age$.
+
+Aquí basta con ver la nube de puntos para concluir que una regresión lineal no será para nada adecuada, pues no se ve forma de justificar una relación lineal entre los datos.
+
+Nuestro argumento queda apoyado además por el valor del estimador $\hat{\beta_{1}}=-0.12$, con lo cual podemos ver es un valor muy cercano a cero, lo cual quiere decir que, si es que existe relación entre ambas variables, esta será muy débil. Más aún, el coeficiente de determinación es $R^{2}=0.14$, lo cual quiere que el modelo explica una muy poca proporción de la variabilidad de $y$.
+
+```{r echo=F,  out.width="80%"}
+plot(df$age, df$medv, title("Diagrama de dispersión"))
+mod3 <- lm(df$medv ~ df$age)
+abline(mod3)
+summary(mod3)
+```
+
+
+Veamos $medv \sim rad$.
+
+En este caso, al ver el diagrama, podemos ver que no se cumple el supuesto de que las observaciones incluyen valores distintos de la variable predictora, pues $rad$ únicamente toma 9 valores distintos. Además, al ver el diagrama no hay manera de justificar el empleo de una regresión lineal.
+```{r echo=F,  out.width="80%"}
+plot(df$rad, df$medv, title("Diagrama de dispersión"))
+mod4 <- lm(df$medv ~ df$rad)
+abline(mod4)
+```
+
+
+
+Sigamos con  $medv \sim tax$.
+En este caso también observamos que no hay forma de justificar la implementación de un modelo de regresión lineal simple, pues no hay ninguna tendencia o relación clara entre ambas variables.
+```{r echo=F,  out.width="80%"}
+plot(df$tax, df$medv, title("Diagrama de dispersión"))
+mod5 <- lm(df$medv ~ df$tax)
+abline(mod5)
+```
+
+
+
+Finalmente veamos el modelo de regresión lineal para $medv \sim lstat$
+
+Notemos que no podemos justificar el uso de una recta para explicar el comportamiento de los datos, pues parecen no estar sobre una recta, pero sí parecen estar sobre una curva
+ $\frac{1}{x}$.
+```{r echo=F,  out.width="80%"}
+plot(df$lstat, df$medv, title("Diagrama de dispersión"))
+mod6 <- lm(df$medv ~ df$lstat)
+abline(mod6)
+summary(mod6)
+```
+Así, una recta puede no ser adecuada para explicar la relación entre ambas variables, pero pudiera ser que una regresión exponencial sí, la cual sigue siendo una regresión lineal simple. Así, tal modelo es:
+
+$y = \beta_{0}*\beta_{1}^{x} \Longrightarrow log(y) = log(\beta_{0}*\beta_{1}^{x})$
+
+$\Longrightarrow \ \therefore log(y) = log(\beta_{0}) + xlog(\beta_{1})$.
+
+A continuación mostramos el diagrama de dispersión para los pares $(lstat, log(medv))$ y el modelo de regresión exonencial. Podemos notar que, aunque la recta parezca no explicar adecuadamente a los datos, sí muestra adecuadamente el sentido y dirección de la relación de ambas variables. Además, se tiene un valor alto del coeficiente de determinación: $R^{2} = 0.64$. A pesar de estp, podemos notar e inferir que no se cumplirá el supuesto de homocedasticidad de los errores. 
+```{r echo=F,  out.width="80%"}
+plot(df$lstat, log(df$medv), title("Diagrama de dispersión"))
+mod7 <- lm(log(df$medv) ~ df$lstat)
+xx <- seq(0,40,0.2)
+yy <- mod7$coefficients[[1]] + (xx*mod7$coefficients[[2]])
+lines(xx,yy,col="purple")
+summary(mod7)
+```
+
+Podemos ver en la siguiente gráfica que no podemos asegurar que no se cumple el supuesto de homocedasticidad. Sin embargo, debemos notar que, al parecer, sí se cumple el supuesto de normalidad de los errores
+```{r echo=F}
+par(mfrow = c(2, 2))
+plot(mod7)
+```
+
+Con la siguiente prueba rechazamos $H_{0}$. Por tanto, no se cumple el supuesto de homocedasticidad 
+```{r echo=F}
+bptest(mod7)
+```
+En conclusión, un modelo de regresión exponencial tampoco servirá para explicar ni predecir adecuadamente la variable $medv$ a partir de $lstat$, aunque sí podría ser de gran ayuda para notar el comportamiento de la variable objetivo, aunque la validez del modelo parece ir decreciendo conforme incrementa el valor de $lstat$.
+
+
+---
+
+
+<!-- REFERENCIAS -->
+<!-- \begin{thebibliography}{99} -->
+<!--   \bibitem{aguilar09} -->
+<!--       Aguilar Madrid, Guadalupe \emph{et al}, -->
+<!--       \emph{Estudio de casos y controles de Mesotelioma Maligno Pleural en trabajadores con Seguridad Social en México}, -->
+<!--       Am. J. Ind. Med. (2009). -->
+<!-- \end{thebibliography} -->
